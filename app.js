@@ -34,13 +34,14 @@ const Gameboard = (function (Player1, Player2) {
     }
   }
   function makeMark(i, j) {
+    if(board[i][j] !== " ") return board[i][j];     //check if square has been used, then exit
     board[i][j] = currentPlayer.getMark(); //insert value into board
     display();
     if (checkWin(i, j, currentPlayer.getMark()))
       console.log(`${currentPlayer.getName()} won the game!`);
-    currentPlayer = currentPlayer === Player1 ? Player2 : Player1;     //toggle current player
+    currentPlayer = currentPlayer === Player1 ? Player2 : Player1; //toggle current player
     console.log(`Its now ${currentPlayer.getName()}'s turn...`);
-    return board[i][j];
+    return board[i][j]; //return mark string ("X" or "O")
   }
   //checks if win conditions have been mets
   function checkWin(i, j, mark) {
@@ -81,6 +82,9 @@ const Gameboard = (function (Player1, Player2) {
     initialize();
     display();
   }
+  function endGame() {
+    DomHandler.reset()
+  }
 
   startGame();
 
@@ -90,7 +94,6 @@ const Gameboard = (function (Player1, Player2) {
 const DomHandler = (function () {
   const board = document.querySelector("#board");
   const boardArray = [];
-  let currPlayer = Gameboard.currentPlayer;
 
   function initialize() {
     for (let i = 0; i < 3; i++) {
@@ -98,26 +101,37 @@ const DomHandler = (function () {
       for (let j = 0; j < 3; j++) {
         let newSquare = document.createElement("div");
         newSquare.id = `${i}-${j}`;
-        setOnPush(newSquare);
-        // newSquare.setAttribute('onclick', "this.innerHTML = Gameboard.currentPlayer.getMark(); let ij = this.id.split('-');Gameboard.makeMark(parseInt(ij[0]),parseInt(ij[1]),Gameboard.currentPlayer.getMark());currPlayer = Gameboard.currentPlayer;");
+        newSquare.addEventListener("click", setMark);
         console.log(newSquare);
         boardArray[boardArray.length - 1].push(newSquare); //add square to row array inside board matrix
         board.appendChild(newSquare); //add square to dom
       }
     }
   }
-  function setOnPush(square) {
-    square.addEventListener("click", setMark);
-  }
-
+  //sends indices of selected square to Gameboard module and updates UI with marking on square
   function setMark(e) {
-    // e.target.innerHTML = Gameboard.currentPlayer.getMark(); //put current players mark in square
     let ij = e.target.id.split("-");
     e.target.innerHTML = Gameboard.makeMark(parseInt(ij[0]), parseInt(ij[1]));
-    // currPlayer = Gameboard.currentPlayer;
+  }
+
+  function reset() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        boardArray[i][j].removeEventListener("click", setMark);
+        boardArray[i][j].innerHTML = "";
+      }
+    }
+  }
+
+  function restart() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        boardArray[i][j].addEventListener("click", setMark);
+      }
+    }
   }
 
   initialize();
 
-  return { boardArray, currPlayer };
+  return { boardArray, reset, restart };
 })();
