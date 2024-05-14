@@ -21,7 +21,7 @@ const playerO = Player("O", "PlayerO");
 const Gameboard = (function (Player1, Player2) {
   const board = [];
   let currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2; //selects random first player
-  console.log(currentPlayer.getName());
+  let turns = 0;
   function initialize() {
     for (let i = 0; i < 3; i++) {
       board.push([]);
@@ -39,10 +39,19 @@ const Gameboard = (function (Player1, Player2) {
   function makeMark(i, j) {
     if (board[i][j] !== " ") return board[i][j]; //check if square has been used, then exit
     board[i][j] = currentPlayer.getMark(); //insert value into board
+    turns++;
     display();
     if (checkWin(i, j, currentPlayer.getMark())) {
+      //win
       console.log(`${currentPlayer.getName()} won the game!`);
       endGame();
+      return board[i][j];
+    }
+    if (turns === 9) {
+      //tie
+      endGame();
+      console.log("Tie");
+      return board[i][j];
     }
     currentPlayer = currentPlayer === Player1 ? Player2 : Player1; //toggle current player
     console.log(`Its now ${currentPlayer.getName()}'s turn...`);
@@ -99,6 +108,7 @@ const Gameboard = (function (Player1, Player2) {
 //dom handler module
 const DomHandler = (function () {
   const board = document.querySelector("#board");
+  const boardControls = document.querySelector("#board-controls");
   const playButton = document.querySelector("#play");
   const form = document.querySelector("form");
   const boardArray = [];
@@ -121,17 +131,21 @@ const DomHandler = (function () {
       }
     }
     board.style.visibility = "hidden";
+    boardControls.style.visibility = "hidden";
   }
 
   function submitHandler(e) {
     e.preventDefault();
     console.log(this);
     board.style.visibility = "visible";
+    boardControls.style.visibility = "visible";
     form.style.visibility = "hidden";
     let player1name = form.children[0].children[1].value;
     let player2name = form.children[1].children[1].value;
-    playerX.setName(player1name ? player1name:"Player 1");
-    playerO.setName(player2name ? player2name:"Player 2");
+    playerX.setName(player1name ? player1name : "Player 1");
+    playerO.setName(player2name ? player2name : "Player 2");
+    boardControls.children[0].children[0].children[0].innerHTML = playerX.getName();    //set name in board controls
+    boardControls.children[1].children[0].children[0].innerHTML = playerO.getName();
   }
   //sends indices of selected square to Gameboard module and updates UI with marking on square
   function setMark(e) {

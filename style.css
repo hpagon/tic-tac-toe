@@ -29,6 +29,7 @@ main {
 }
 
 #game {
+    /* position: fixed; */
     width: 100%;
     height: 100%;
     display: flex;
@@ -37,7 +38,7 @@ main {
 }
 
 #board {
-    position: fixed;
+    /* position: fixed; */
     border: 1px solid black;
     width: 500px;
     height: 500px;
@@ -54,3 +55,7 @@ main {
     justify-content: center;
 }
 
+#board-controls {
+    border: 1px solid black;
+    margin-left: 10px;
+}
