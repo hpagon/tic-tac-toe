@@ -15,8 +15,10 @@ const playerX = Player("X", "PlayerX");
 const playerO = Player("O", "PlayerO");
 
 //gameboard module
-const Gameboard = (function () {
+const Gameboard = (function (Player1, Player2) {
   const board = [];
+  let currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2; //selects random first player
+  console.log(currentPlayer.getName());
   function initialize() {
     for (let i = 0; i < 3; i++) {
       board.push([]);
@@ -31,11 +33,16 @@ const Gameboard = (function () {
       console.log("       _____");
     }
   }
-  function makeMark(i, j, value) {
-    board[i][j] = value;
+  function makeMark(i, j) {
+    board[i][j] = currentPlayer.getMark(); //insert value into board
     display();
-    if (checkWin(i, j, value)) console.log("Game Won");
+    if (checkWin(i, j, currentPlayer.getMark()))
+      console.log(`${currentPlayer.getName()} won the game!`);
+    currentPlayer = currentPlayer === Player1 ? Player2 : Player1;     //toggle current player
+    console.log(`Its now ${currentPlayer.getName()}'s turn...`);
+    return board[i][j];
   }
+  //checks if win conditions have been mets
   function checkWin(i, j, mark) {
     let win = false;
     //check main diagonal win condition
@@ -71,35 +78,19 @@ const Gameboard = (function () {
     return win;
   }
   function startGame() {
-    let args = [];
-    let input = "";
     initialize();
     display();
-    // while(input !== "done") {
-    //     args.push(prompt("Enter Row: "));
-    //     args.push(prompt("Enter Column: "));
-    //     args.push(prompt("Enter Mark: "));
-    //     input = "done";
-    //     makeMark(parseInt(args[0]), parseInt(args[1]), args[2]);    //take input and make mark
-    //     display();                                                  //display board
-    //     if (checkWin(parseInt(args[1]), parseInt(args[2]), args[2]) === true) {     //check if game won
-    //         console.log(`Game Over`);
-    //         break;
-    //     }
-    //     input = args[2];
-    //     args.splice(0, 3);                                          //clear input array
-    //     console.log('cleared');
-    // }
   }
 
   startGame();
 
-  return { board, makeMark, display };
-})();
+  return { board, makeMark, display, currentPlayer };
+})(playerX, playerO);
 
 const DomHandler = (function () {
   const board = document.querySelector("#board");
   const boardArray = [];
+  let currPlayer = Gameboard.currentPlayer;
 
   function initialize() {
     for (let i = 0; i < 3; i++) {
@@ -108,20 +99,25 @@ const DomHandler = (function () {
         let newSquare = document.createElement("div");
         newSquare.id = `${i}-${j}`;
         setOnPush(newSquare);
+        // newSquare.setAttribute('onclick', "this.innerHTML = Gameboard.currentPlayer.getMark(); let ij = this.id.split('-');Gameboard.makeMark(parseInt(ij[0]),parseInt(ij[1]),Gameboard.currentPlayer.getMark());currPlayer = Gameboard.currentPlayer;");
+        console.log(newSquare);
         boardArray[boardArray.length - 1].push(newSquare); //add square to row array inside board matrix
         board.appendChild(newSquare); //add square to dom
       }
     }
   }
   function setOnPush(square) {
-    square.addEventListener("click", (e) => {
-      square.innerHTML = "X";
-      let ij = square.id.split("-");
-      Gameboard.makeMark(parseInt(ij[0]), parseInt(ij[1]), "X");
-    });
+    square.addEventListener("click", setMark);
+  }
+
+  function setMark(e) {
+    // e.target.innerHTML = Gameboard.currentPlayer.getMark(); //put current players mark in square
+    let ij = e.target.id.split("-");
+    e.target.innerHTML = Gameboard.makeMark(parseInt(ij[0]), parseInt(ij[1]));
+    // currPlayer = Gameboard.currentPlayer;
   }
 
   initialize();
 
-  return { boardArray };
+  return { boardArray, currPlayer };
 })();
