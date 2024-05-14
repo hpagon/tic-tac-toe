@@ -7,10 +7,37 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* background-color: gray; */
+}
+
+header {
+    height: 10vh;
+    display: flex;
+    align-items: center;
+}
+
+main {
+    height: 90vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#menu {
+    position: fixed;
+}
+
+#game {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #board {
+    position: fixed;
     border: 1px solid black;
     width: 500px;
     height: 500px;
@@ -22,5 +49,8 @@ body {
 
 #board div {
     border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 

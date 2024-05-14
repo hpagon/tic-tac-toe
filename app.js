@@ -6,8 +6,11 @@ const Player = function (mark, name) {
   function getName() {
     return name;
   }
+  function setName(newName) {
+    name = newName;
+  }
 
-  return { getMark, getName };
+  return { getMark, getName, setName };
 };
 
 //players
@@ -34,11 +37,13 @@ const Gameboard = (function (Player1, Player2) {
     }
   }
   function makeMark(i, j) {
-    if(board[i][j] !== " ") return board[i][j];     //check if square has been used, then exit
+    if (board[i][j] !== " ") return board[i][j]; //check if square has been used, then exit
     board[i][j] = currentPlayer.getMark(); //insert value into board
     display();
-    if (checkWin(i, j, currentPlayer.getMark()))
+    if (checkWin(i, j, currentPlayer.getMark())) {
       console.log(`${currentPlayer.getName()} won the game!`);
+      endGame();
+    }
     currentPlayer = currentPlayer === Player1 ? Player2 : Player1; //toggle current player
     console.log(`Its now ${currentPlayer.getName()}'s turn...`);
     return board[i][j]; //return mark string ("X" or "O")
@@ -83,7 +88,7 @@ const Gameboard = (function (Player1, Player2) {
     display();
   }
   function endGame() {
-    DomHandler.reset()
+    DomHandler.freezeBoard();
   }
 
   startGame();
@@ -91,11 +96,19 @@ const Gameboard = (function (Player1, Player2) {
   return { board, makeMark, display, currentPlayer };
 })(playerX, playerO);
 
+//dom handler module
 const DomHandler = (function () {
   const board = document.querySelector("#board");
+  const playButton = document.querySelector("#play");
+  const form = document.querySelector("form");
   const boardArray = [];
 
   function initialize() {
+    playButton.addEventListener("click", submitHandler);
+    initializeBoard();
+  }
+
+  function initializeBoard() {
     for (let i = 0; i < 3; i++) {
       boardArray.push([]);
       for (let j = 0; j < 3; j++) {
@@ -107,23 +120,42 @@ const DomHandler = (function () {
         board.appendChild(newSquare); //add square to dom
       }
     }
+    board.style.visibility = "hidden";
+  }
+
+  function submitHandler(e) {
+    e.preventDefault();
+    console.log(this);
+    board.style.visibility = "visible";
+    form.style.visibility = "hidden";
+    let player1name = form.children[0].children[1].value;
+    let player2name = form.children[1].children[1].value;
+    playerX.setName(player1name ? player1name:"Player 1");
+    playerO.setName(player2name ? player2name:"Player 2");
   }
   //sends indices of selected square to Gameboard module and updates UI with marking on square
   function setMark(e) {
     let ij = e.target.id.split("-");
     e.target.innerHTML = Gameboard.makeMark(parseInt(ij[0]), parseInt(ij[1]));
   }
-
-  function reset() {
+  //removes event listeners from squares
+  function freezeBoard() {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         boardArray[i][j].removeEventListener("click", setMark);
+      }
+    }
+  }
+
+  function resetBoard() {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
         boardArray[i][j].innerHTML = "";
       }
     }
   }
 
-  function restart() {
+  function restartBoard() {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         boardArray[i][j].addEventListener("click", setMark);
@@ -133,5 +165,5 @@ const DomHandler = (function () {
 
   initialize();
 
-  return { boardArray, reset, restart };
+  return { boardArray, resetBoard, restartBoard, freezeBoard };
 })();

@@ -3,15 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <title>Tic Tac Toe</title>
   </head>
   <body>
     <header>
       <h1>Tic Tac Toe</h1>
     </header>
-    <div id="board">
-    </div>
+    <main>
+      <div id="menu">
+        <form action="">
+          <div>
+            <label for="player1name">Enter players name...</label>
+            <input type="text" name="player1name" placeholder="Player 1" />
+          </div>
+          <div>
+            <label for="player2name">Enter players name...</label>
+            <input type="text" name="player2name" placeholder="Player 2" />
+          </div>
+          <div><input type="submit" value="Play" id="play" /></div>
+        </form>
+      </div>
+      <div id="game">
+        <div id="board"></div>
+      </div>
+    </main>
     <script src="app.js"></script>
   </body>
 </html>
