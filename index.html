@@ -15,32 +15,34 @@
   <body>
     <header>
       <h1>Tic Tac Toe</h1>
+      <div>
+        <img src="images/light_mode.svg" alt="Light Mode Icon" />
+      </div>
     </header>
     <main>
       <div id="menu">
         <form action="">
           <div>
             <div>
-                <h2>X</h2>
-                <input type="text" name="player1name" placeholder="Player 1" />
-                <label for="player1name">Enter players name...</label>
+              <h2>X</h2>
+              <input type="text" name="player1name" placeholder="Player 1" />
+              <label for="player1name">Enter players name...</label>
             </div>
             <div>
-                <h2>O</h2>
-                <input type="text" name="player2name" placeholder="Player 2" />
-                <label for="player2name">Enter players name...</label>
+              <h2>O</h2>
+              <input type="text" name="player2name" placeholder="Player 2" />
+              <label for="player2name">Enter players name...</label>
             </div>
           </div>
           <div><input type="submit" value="Play" id="play" /></div>
         </form>
       </div>
       <div id="game">
-        <div id="board"></div>
         <div id="board-controls">
-          <div id="p1">
+          <div id="p1" class="player-div">
             <p>X: <span></span></p>
           </div>
-          <div id="p2">
+          <div id="p2" class="player-div">
             <p>O: <span></span></p>
           </div>
           <div>
@@ -49,16 +51,18 @@
           <div>
             <img src="images/home.svg" alt="Home Icon" />
           </div>
-          <div>
-            <img src="images/light_mode.svg" alt="Light Mode Icon" />
-          </div>
         </div>
+        <div id="board"></div>
       </div>
     </main>
     <dialog>
       <form action="" method="dialog">
-        <h2><span>Player</span><span>Win</span></h2>
-        <img src="images/restart_alt.svg" alt="Restart Icon" />
+        <div>
+          <h2><span>Player</span><span>Win</span></h2>
+        </div>
+        <div>
+          <img src="images/restart_alt.svg" alt="Restart Icon" />
+        </div>  
       </form>
     </dialog>
     <script src="app.js"></script>

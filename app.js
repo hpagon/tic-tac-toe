@@ -172,7 +172,7 @@ const DomHandler = (function () {
       boardControls.style.visibility = "hidden";
       form.style.display = "block";
     });
-    dialog.children[0].children[1].addEventListener("click", () => {
+    dialog.children[0].children[1].children[0].addEventListener("click", () => {
       dialog.close();
       resetBoard();
       Gameboard.startGame();
@@ -264,8 +264,8 @@ const DomHandler = (function () {
   }
 
   function showDialog(winner, result) {
-    dialog.children[0].children[0].children[0].innerHTML = winner;
-    dialog.children[0].children[0].children[1].innerHTML = result;
+    dialog.children[0].children[0].children[0].children[0].innerHTML = winner;
+    dialog.children[0].children[0].children[0].children[1].innerHTML = result;
     dialog.showModal();
   }
 

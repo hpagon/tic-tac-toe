@@ -4,6 +4,9 @@
     --font-color: #F8F9FA;
     --highlight-color: #6C757D;
     --square-color: #343A40;
+    --highlight-secondary-color: #495057;
+    --backdrop-color: rgba(255, 255, 255, 0.1);
+    --backdrop-secondary-color: rgba(255, 255, 255, 0.4);
 }
 
 :root.light {
@@ -75,6 +78,7 @@ input {
     height: 40px;
     width: 200px;
     background-color: rgba(0, 0, 0, 0.01);
+    /* background-color: var(--backdrop-color); */
     border: 0px;
     border-bottom: 1px solid var(--font-color);
     color: var(--font-color);
@@ -94,8 +98,8 @@ input[type="submit"] {
 
 #game {
     width: 100%;
-    height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -113,7 +117,7 @@ input[type="submit"] {
 }
 /* square style */
 #board div {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -124,8 +128,23 @@ input[type="submit"] {
 }
 
 #board-controls {
-    border: 1px solid black;
-    margin-left: 10px;
+    width: 500px;
+    height: 50px;
+    /* border: 1px solid black; */
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 15px;
+    background-color: var(--backdrop-color);
+    border-radius: 12px;
+}
+
+#board-controls .player-div {
+    /* height: 50px; */
+    padding: 0px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
 }
 
 #board-controls div p {
@@ -141,6 +160,21 @@ input[type="submit"] {
     background-color: var(--highlight-color);
 }
 
-dialog {
+dialog[open] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: auto;
+    border: 0px;
+    outline: none;
+    height: 100px;
+    width: 200px;
+    border-radius: 12px;
+    background-color: var(--backdrop-secondary-color);
+}
+
+dialog[open] form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
