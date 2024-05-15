@@ -57,6 +57,7 @@ const Gameboard = (function (Player1, Player2) {
       return board[i][j];
     }
     currentPlayer = currentPlayer === Player1 ? Player2 : Player1; //toggle current player
+    DomHandler.highlightPlayer(currentPlayer.getMark());
     console.log(`Its now ${currentPlayer.getName()}'s turn...`);
     return board[i][j]; //return mark string ("X" or "O")
   }
@@ -136,6 +137,7 @@ const Gameboard = (function (Player1, Player2) {
     over = false;
     //choose random starting player again
     currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2;
+    DomHandler.highlightPlayer(currentPlayer.getMark());
   }
   function endGame() {
     DomHandler.freezeBoard();
@@ -176,6 +178,7 @@ const DomHandler = (function () {
       Gameboard.startGame();
     });
     initializeBoard();
+    highlightPlayer(Gameboard.currentPlayer.getMark());
   }
 
   function initializeBoard() {
@@ -243,7 +246,20 @@ const DomHandler = (function () {
   function highlightWin(winningSquares) {
     console.log(winningSquares);
     for (let square of winningSquares) {
-        boardArray[square[0]][square[1]].classList.add("highlight");
+      boardArray[square[0]][square[1]].classList.add("highlight");
+    }
+  }
+  //applies and removes player hightlighting based on whose turn it is
+  function highlightPlayer(mark) {
+    switch (mark) {     
+      case "X":
+        boardControls.children[0].classList.add('highlight');
+        boardControls.children[1].classList.remove('highlight');
+        break;
+      case "O":
+        boardControls.children[1].classList.add('highlight');
+        boardControls.children[0].classList.remove('highlight');
+        break;
     }
   }
 
@@ -262,5 +278,6 @@ const DomHandler = (function () {
     freezeBoard,
     highlightWin,
     showDialog,
+    highlightPlayer,
   };
 })();
