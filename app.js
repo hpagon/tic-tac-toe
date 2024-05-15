@@ -22,6 +22,7 @@ const Gameboard = (function (Player1, Player2) {
   const board = [];
   let currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2; //selects random first player
   let turns = 0;
+  let over = false;
   function initialize() {
     for (let i = 0; i < 3; i++) {
       board.push([]);
@@ -60,12 +61,20 @@ const Gameboard = (function (Player1, Player2) {
   //checks if win conditions have been mets
   function checkWin(i, j, mark) {
     let win = false;
+    let winningSquares = [];
     //check main diagonal win condition
     if (win === false && i === j) {
       //check if mark is in a main diagonal square
       win = true;
       for (let k = 0; k < 3; k++) {
         if (board[k][k] !== mark) win = false;
+      }
+      if (win === true) {
+        for (let k = 0; k < 3; k++) {
+          winningSquares.push([]);
+          winningSquares[winningSquares.length - 1].push(k);
+          winningSquares[winningSquares.length - 1].push(k);
+        }
       }
     }
     //check off diagonal win condition
@@ -75,12 +84,26 @@ const Gameboard = (function (Player1, Player2) {
       for (let k = 0; k < 3; k++) {
         if (board[k][2 - k] !== mark) win = false;
       }
+      if (win === true) {
+        for (let k = 0; k < 3; k++) {
+          winningSquares.push([]);
+          winningSquares[winningSquares.length - 1].push(k);
+          winningSquares[winningSquares.length - 1].push(2 - k);
+        }
+      }
     }
     //check row win condition
     if (win === false) {
       win = true;
       for (let k = 0; k < 3; k++) {
         if (board[i][k] !== mark) win = false;
+      }
+      if (win === true) {
+        for (let k = 0; k < 3; k++) {
+          winningSquares.push([]);
+          winningSquares[winningSquares.length - 1].push(i);
+          winningSquares[winningSquares.length - 1].push(k);
+        }
       }
     }
     //check column win condition
@@ -89,20 +112,37 @@ const Gameboard = (function (Player1, Player2) {
       for (let k = 0; k < 3; k++) {
         if (board[k][j] !== mark) win = false;
       }
+      if (win === true) {
+        for (let k = 0; k < 3; k++) {
+          winningSquares.push([]);
+          winningSquares[winningSquares.length - 1].push(k);
+          winningSquares[winningSquares.length - 1].push(j);
+        }
+      }
     }
+    DomHandler.highlightWin(winningSquares);
     return win;
   }
   function startGame() {
-    initialize();
-    display();
+    turns = 0; //reset turns
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        board[i][j] = " "; //reset all marks in board
+      }
+    }
+    if (over) DomHandler.restartBoard();
+    over = false;
+    currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2;
   }
   function endGame() {
     DomHandler.freezeBoard();
+    over = true;
   }
 
-  startGame();
+  initialize();
+  display();
 
-  return { board, makeMark, display, currentPlayer };
+  return { board, makeMark, display, currentPlayer, startGame };
 })(playerX, playerO);
 
 //dom handler module
@@ -115,6 +155,17 @@ const DomHandler = (function () {
 
   function initialize() {
     playButton.addEventListener("click", submitHandler);
+    boardControls.children[2].addEventListener("click", () => {
+      //restart button event handler
+      resetBoard();
+      Gameboard.startGame();
+    });
+    boardControls.children[3].addEventListener("click", () => {
+      //home button event handler
+      board.style.visibility = "hidden";
+      boardControls.style.visibility = "hidden";
+      form.style.display = "block";
+    });
     initializeBoard();
   }
 
@@ -139,13 +190,15 @@ const DomHandler = (function () {
     console.log(this);
     board.style.visibility = "visible";
     boardControls.style.visibility = "visible";
-    form.style.visibility = "hidden";
+    form.style.display = "none";
     let player1name = form.children[0].children[1].value;
     let player2name = form.children[1].children[1].value;
     playerX.setName(player1name ? player1name : "Player 1");
     playerO.setName(player2name ? player2name : "Player 2");
-    boardControls.children[0].children[0].children[0].innerHTML = playerX.getName();    //set name in board controls
-    boardControls.children[1].children[0].children[0].innerHTML = playerO.getName();
+    boardControls.children[0].children[0].children[0].innerHTML =
+      playerX.getName(); //set name in board controls
+    boardControls.children[1].children[0].children[0].innerHTML =
+      playerO.getName();
   }
   //sends indices of selected square to Gameboard module and updates UI with marking on square
   function setMark(e) {
@@ -173,11 +226,19 @@ const DomHandler = (function () {
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         boardArray[i][j].addEventListener("click", setMark);
+        boardArray[i][j].classList.remove("highlight");
       }
+    }
+  }
+  //highlights the winning combination of squares
+  function highlightWin(winningSquares) {
+    console.log(winningSquares);
+    for (let square of winningSquares) {
+      boardArray[square[0]][square[1]].classList.add("highlight");
     }
   }
 
   initialize();
 
-  return { boardArray, resetBoard, restartBoard, freezeBoard };
+  return { boardArray, resetBoard, restartBoard, freezeBoard, highlightWin };
 })();
