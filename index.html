@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
     <title>Tic Tac Toe</title>
   </head>
   <body>
@@ -14,12 +20,16 @@
       <div id="menu">
         <form action="">
           <div>
-            <label for="player1name">Enter players name...</label>
-            <input type="text" name="player1name" placeholder="Player 1" />
-          </div>
-          <div>
-            <label for="player2name">Enter players name...</label>
-            <input type="text" name="player2name" placeholder="Player 2" />
+            <div>
+                <h2>X</h2>
+                <input type="text" name="player1name" placeholder="Player 1" />
+                <label for="player1name">Enter players name...</label>
+            </div>
+            <div>
+                <h2>O</h2>
+                <input type="text" name="player2name" placeholder="Player 2" />
+                <label for="player2name">Enter players name...</label>
+            </div>
           </div>
           <div><input type="submit" value="Play" id="play" /></div>
         </form>
@@ -27,26 +37,29 @@
       <div id="game">
         <div id="board"></div>
         <div id="board-controls">
-            <div id="p1">
-                <p>X: <span></span></p>
-            </div>
-            <div id="p2">
-                <p>O: <span></span></p>
-            </div>
-            <div>
-                <img src="images/restart_alt.svg" alt="Restart Icon">
-            </div>
-            <div>
-                <img src="images/home.svg" alt="Home Icon">
-            </div>
+          <div id="p1">
+            <p>X: <span></span></p>
+          </div>
+          <div id="p2">
+            <p>O: <span></span></p>
+          </div>
+          <div>
+            <img src="images/restart_alt.svg" alt="Restart Icon" />
+          </div>
+          <div>
+            <img src="images/home.svg" alt="Home Icon" />
+          </div>
+          <div>
+            <img src="images/light_mode.svg" alt="Light Mode Icon" />
+          </div>
         </div>
       </div>
     </main>
     <dialog>
-        <form action="" method="dialog">
-            <h2><span>Player</span><span>Win</span></h2>
-            <img src="images/restart_alt.svg" alt="Restart Icon">
-        </form>
+      <form action="" method="dialog">
+        <h2><span>Player</span><span>Win</span></h2>
+        <img src="images/restart_alt.svg" alt="Restart Icon" />
+      </form>
     </dialog>
     <script src="app.js"></script>
   </body>

@@ -203,8 +203,8 @@ const DomHandler = (function () {
     board.style.visibility = "visible";
     boardControls.style.visibility = "visible";
     form.style.display = "none";
-    let player1name = form.children[0].children[1].value;
-    let player2name = form.children[1].children[1].value;
+    let player1name = form.children[0].children[0].children[1].value;
+    let player2name = form.children[0].children[1].children[1].value;
     playerX.setName(player1name ? player1name : "Player 1");
     playerO.setName(player2name ? player2name : "Player 2");
     boardControls.children[0].children[0].children[0].innerHTML =
@@ -269,7 +269,14 @@ const DomHandler = (function () {
     dialog.showModal();
   }
 
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.className = root.className === "dark" ? "light":"dark";
+  }
+
   initialize();
+  toggleTheme();
+//   toggleTheme();
 
   return {
     boardArray,
