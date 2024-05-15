@@ -46,12 +46,14 @@ const Gameboard = (function (Player1, Player2) {
       //win
       console.log(`${currentPlayer.getName()} won the game!`);
       endGame();
+      DomHandler.showDialog(currentPlayer.getName() + " ", "wins");
       return board[i][j];
     }
     if (turns === 9) {
       //tie
       endGame();
       console.log("Tie");
+      DomHandler.showDialog("", "Tie");
       return board[i][j];
     }
     currentPlayer = currentPlayer === Player1 ? Player2 : Player1; //toggle current player
@@ -132,6 +134,7 @@ const Gameboard = (function (Player1, Player2) {
     }
     if (over) DomHandler.restartBoard();
     over = false;
+    //choose random starting player again
     currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2;
   }
   function endGame() {
@@ -152,6 +155,7 @@ const DomHandler = (function () {
   const playButton = document.querySelector("#play");
   const form = document.querySelector("form");
   const boardArray = [];
+  const dialog = document.querySelector("dialog");
 
   function initialize() {
     playButton.addEventListener("click", submitHandler);
@@ -165,6 +169,11 @@ const DomHandler = (function () {
       board.style.visibility = "hidden";
       boardControls.style.visibility = "hidden";
       form.style.display = "block";
+    });
+    dialog.children[0].children[1].addEventListener("click", () => {
+      dialog.close();
+      resetBoard();
+      Gameboard.startGame();
     });
     initializeBoard();
   }
@@ -184,7 +193,7 @@ const DomHandler = (function () {
     board.style.visibility = "hidden";
     boardControls.style.visibility = "hidden";
   }
-
+  //play button event listener
   function submitHandler(e) {
     e.preventDefault();
     console.log(this);
@@ -234,11 +243,24 @@ const DomHandler = (function () {
   function highlightWin(winningSquares) {
     console.log(winningSquares);
     for (let square of winningSquares) {
-      boardArray[square[0]][square[1]].classList.add("highlight");
+        boardArray[square[0]][square[1]].classList.add("highlight");
     }
+  }
+
+  function showDialog(winner, result) {
+    dialog.children[0].children[0].children[0].innerHTML = winner;
+    dialog.children[0].children[0].children[1].innerHTML = result;
+    dialog.showModal();
   }
 
   initialize();
 
-  return { boardArray, resetBoard, restartBoard, freezeBoard, highlightWin };
+  return {
+    boardArray,
+    resetBoard,
+    restartBoard,
+    freezeBoard,
+    highlightWin,
+    showDialog,
+  };
 })();
