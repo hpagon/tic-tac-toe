@@ -2,7 +2,7 @@
 :root.dark {
     --background-color: #212529;
     --font-color: #F8F9FA;
-    --highlight-color: #6C757D;
+    --highlight-color: #09850f;
     --square-color: #343A40;
     --highlight-secondary-color: #495057;
     --backdrop-color: rgba(255, 255, 255, 0.1);
@@ -11,6 +11,12 @@
 
 :root.light {
     --background-color: #F8F9FA;
+    --font-color: #212529;
+    --highlight-color: #fcb721;
+    --square-color: #6C757D;
+    --highlight-secondary-color: #495057;
+    --backdrop-color: rgba(0, 0, 0, 0.4);
+    --backdrop-secondary-color: rgba(255, 255, 255, 0.4);
 }
 
 * {
@@ -28,14 +34,16 @@ body {
 }
 
 header {
-    height: 10vh;
+    width: 100%;
+    height: 70px;
     display: flex;
+    justify-content: center;
     align-items: center;
-    /* font-size: 24px; */
 }
 
 main {
-    height: 90vh;
+    margin-top: 45px;
+    height: 1fr;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -128,23 +136,31 @@ input[type="submit"] {
 }
 
 #board-controls {
-    width: 500px;
+    width: 470px;
     height: 50px;
-    /* border: 1px solid black; */
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 5fr 5fr 1fr 1fr;
     align-items: center;
+    gap: 5px;
+    padding: 0px 15px;
     margin-bottom: 15px;
     background-color: var(--backdrop-color);
     border-radius: 12px;
 }
 
 #board-controls .player-div {
-    /* height: 50px; */
+    white-space: nowrap;
+    overflow: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
     padding: 0px 10px;
     border-radius: 12px;
     display: flex;
     align-items: center;
+}
+
+#board-controls div:nth-child(n + 3) {
+    justify-self: center;
 }
 
 #board-controls div p {
@@ -167,14 +183,81 @@ dialog[open] {
     margin: auto;
     border: 0px;
     outline: none;
-    height: 100px;
+    height: max(100px, 1fr);
     width: 200px;
     border-radius: 12px;
     background-color: var(--backdrop-secondary-color);
+    padding: 15px;
 }
 
 dialog[open] form {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+}
+
+dialog[open] form div:nth-child(1) {
+    width: 100%;
+    overflow-wrap: break-word;
+    text-align: center;
+}
+
+dialog[open] form div:nth-child(2) {
+    display: flex;
+}
+
+dialog[open] form div:nth-child(2) div {
+    scale: 1.5;
+    filter: invert(0%) sepia(1%) saturate(7430%) hue-rotate(124deg) brightness(0%) contrast(100%);
+    margin: 0px 10px;
+    margin-top: 10px;
+}
+
+dialog[open]::backdrop {
+    backdrop-filter: blur(4px);
+}
+
+#theme-button {
+    filter: invert(11%) sepia(3%) saturate(2453%) hue-rotate(169deg) brightness(96%) contrast(92%);
+    scale: 1.2;
+    margin-left: 100%;
+}
+/* media queries */
+@media (max-width: 540px) {
+    #board-controls {
+        width: 370px;
+    }
+    #board {
+        width: 400px;
+        height: 400px;
+    }
+    #menu {
+        scale: 0.9;
+    }
+    #board-controls .player-div p {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 450px) {
+    #board-controls {
+        width: 270px;
+    }
+    #board {
+        width: 300px;
+        height: 300px;
+    }
+    #menu form div {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     margin-bottom: 15px;
+    }
+    #menu form div div h2 {
+        margin-bottom: 0px;
+    }
+    #board-controls .player-div p {
+        font-size: 18px;
+    }
 }

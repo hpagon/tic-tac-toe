@@ -158,6 +158,8 @@ const DomHandler = (function () {
   const form = document.querySelector("form");
   const boardArray = [];
   const dialog = document.querySelector("dialog");
+  const themeButton = document.querySelector("#theme-button");
+  const closeButton = document.querySelector("#close-button");
 
   function initialize() {
     playButton.addEventListener("click", submitHandler);
@@ -177,6 +179,12 @@ const DomHandler = (function () {
       resetBoard();
       Gameboard.startGame();
     });
+    themeButton.addEventListener('click', () => {
+        toggleTheme();
+    })
+    closeButton.addEventListener('click', () => {
+        dialog.close();
+    })
     initializeBoard();
     highlightPlayer(Gameboard.currentPlayer.getMark());
   }
@@ -271,12 +279,12 @@ const DomHandler = (function () {
 
   function toggleTheme() {
     const root = document.documentElement;
+    themeButton.src = root.className === "dark" ? "images/dark_mode.svg":"images/light_mode.svg";
     root.className = root.className === "dark" ? "light":"dark";
   }
 
   initialize();
   toggleTheme();
-//   toggleTheme();
 
   return {
     boardArray,

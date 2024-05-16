@@ -16,7 +16,11 @@
     <header>
       <h1>Tic Tac Toe</h1>
       <div>
-        <img src="images/light_mode.svg" alt="Light Mode Icon" />
+        <img
+          src="images/light_mode.svg"
+          alt="Light Mode Icon"
+          id="theme-button"
+        />
       </div>
     </header>
     <main>
@@ -25,12 +29,22 @@
           <div>
             <div>
               <h2>X</h2>
-              <input type="text" name="player1name" placeholder="Player 1" />
+              <input
+                type="text"
+                name="player1name"
+                placeholder="Player 1"
+                maxlength="100"
+              />
               <label for="player1name">Enter players name...</label>
             </div>
             <div>
               <h2>O</h2>
-              <input type="text" name="player2name" placeholder="Player 2" />
+              <input
+                type="text"
+                name="player2name"
+                placeholder="Player 2"
+                maxlength="100"
+              />
               <label for="player2name">Enter players name...</label>
             </div>
           </div>
@@ -61,8 +75,13 @@
           <h2><span>Player</span><span>Win</span></h2>
         </div>
         <div>
-          <img src="images/restart_alt.svg" alt="Restart Icon" />
-        </div>  
+          <div>
+            <img src="images/restart_alt.svg" alt="Restart Icon" />
+          </div>
+          <div>
+            <img src="images/close.svg" alt="Close Icon" id="close-button" />
+          </div>
+        </div>
       </form>
     </dialog>
     <script src="app.js"></script>
