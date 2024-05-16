@@ -179,12 +179,15 @@ const DomHandler = (function () {
       resetBoard();
       Gameboard.startGame();
     });
-    themeButton.addEventListener('click', () => {
-        toggleTheme();
-    })
-    closeButton.addEventListener('click', () => {
-        dialog.close();
-    })
+    themeButton.addEventListener("click", () => {
+      toggleTheme();
+    });
+    closeButton.addEventListener("click", () => {
+      dialog.close();
+    });
+    //scroll event listeners for player names.
+    boardControls.children[0].addEventListener("click", scrollForward);
+    boardControls.children[1].addEventListener("click", scrollForward);
     initializeBoard();
     highlightPlayer(Gameboard.currentPlayer.getMark());
   }
@@ -259,14 +262,14 @@ const DomHandler = (function () {
   }
   //applies and removes player hightlighting based on whose turn it is
   function highlightPlayer(mark) {
-    switch (mark) {     
+    switch (mark) {
       case "X":
-        boardControls.children[0].classList.add('highlight');
-        boardControls.children[1].classList.remove('highlight');
+        boardControls.children[0].classList.add("highlight");
+        boardControls.children[1].classList.remove("highlight");
         break;
       case "O":
-        boardControls.children[1].classList.add('highlight');
-        boardControls.children[0].classList.remove('highlight');
+        boardControls.children[1].classList.add("highlight");
+        boardControls.children[0].classList.remove("highlight");
         break;
     }
   }
@@ -279,8 +282,37 @@ const DomHandler = (function () {
 
   function toggleTheme() {
     const root = document.documentElement;
-    themeButton.src = root.className === "dark" ? "images/dark_mode.svg":"images/light_mode.svg";
-    root.className = root.className === "dark" ? "light":"dark";
+    themeButton.src =
+      root.className === "dark"
+        ? "images/dark_mode.svg"
+        : "images/light_mode.svg";
+    root.className = root.className === "dark" ? "light" : "dark";
+  }
+
+  function scrollForward(e) {
+    //calculate length of p + extra fluff
+    length = this.children[0].scrollWidth + 150;
+    for (let i = 0; i < length; i++) {
+      setTimeout(scrollDiv, i*5, this);
+      console.log(this.scrollX);
+    }
+    setTimeout(scrollBack, length*5 + 500, this);
+    //prevent function from being called while scrolling
+    this.removeEventListener('click', scrollForward);   
+    //add event listener back after done scrolling
+    setTimeout(addScroll, length*5+550, this);
+  }
+
+  function scrollDiv(div) {
+    div.scrollLeft += 1;
+  }
+
+  function scrollBack(div) {
+    div.scrollLeft = 0;
+  }
+
+  function addScroll(div) {
+    div.addEventListener('click', scrollForward);
   }
 
   initialize();

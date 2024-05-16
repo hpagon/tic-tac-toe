@@ -7,6 +7,7 @@
     --highlight-secondary-color: #495057;
     --backdrop-color: rgba(255, 255, 255, 0.1);
     --backdrop-secondary-color: rgba(255, 255, 255, 0.4);
+    --input-background-color: rgba(255, 255, 255, 0.01);
 }
 
 :root.light {
@@ -17,6 +18,7 @@
     --highlight-secondary-color: #495057;
     --backdrop-color: rgba(0, 0, 0, 0.4);
     --backdrop-secondary-color: rgba(255, 255, 255, 0.4);
+    --input-background-color: rgba(0, 0, 0, 0.01);
 }
 
 * {
@@ -85,7 +87,7 @@ main {
 input {
     height: 40px;
     width: 200px;
-    background-color: rgba(0, 0, 0, 0.01);
+    background-color: var(--input-background-color);
     /* background-color: var(--backdrop-color); */
     border: 0px;
     border-bottom: 1px solid var(--font-color);
