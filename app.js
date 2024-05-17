@@ -1,5 +1,5 @@
 //player factory function
-const Player = function (mark, name) {
+const Player = function (mark, name, type) {
   function getMark() {
     return mark;
   }
@@ -9,13 +9,18 @@ const Player = function (mark, name) {
   function setName(newName) {
     name = newName;
   }
-
-  return { getMark, getName, setName };
+  function getType() {
+    return type;
+  }
+  function setType(newType) {
+    type = newType;
+  }
+  return { getMark, getName, setName, getType, setType };
 };
 
 //players
-const playerX = Player("X", "PlayerX");
-const playerO = Player("O", "PlayerO");
+const playerX = Player("X", "PlayerX", "Person");
+const playerO = Player("O", "PlayerO", "Person");
 
 //gameboard module
 const Gameboard = (function (Player1, Player2) {
@@ -138,16 +143,27 @@ const Gameboard = (function (Player1, Player2) {
     //choose random starting player again
     currentPlayer = Math.floor(Math.random() * 2) === 0 ? Player1 : Player2;
     DomHandler.highlightPlayer(currentPlayer.getMark());
+    makeMoveBot();
   }
   function endGame() {
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          if(board[i][j] === ' ') board[i][j] = "-"; //occupy all empty squares so bot doesn't make move
+        }
+      }
     DomHandler.freezeBoard();
     over = true;
+  }
+  //So the updated current player can be accessed
+  function makeMoveBot() {
+    console.log(currentPlayer.getType());
+    if (currentPlayer.getType() === "Bot") Bot.makeMove();
   }
 
   initialize();
   display();
 
-  return { board, makeMark, display, currentPlayer, startGame };
+  return { board, makeMark, display, currentPlayer, startGame, makeMoveBot };
 })(playerX, playerO);
 
 //dom handler module
@@ -170,8 +186,8 @@ const DomHandler = (function () {
     });
     boardControls.children[3].addEventListener("click", () => {
       //home button event handler
-      board.style.visibility = "hidden";
-      boardControls.style.visibility = "hidden";
+      board.style.display = "none";
+      boardControls.style.display = "none";
       form.style.display = "block";
     });
     dialog.children[0].children[1].children[0].addEventListener("click", () => {
@@ -188,6 +204,14 @@ const DomHandler = (function () {
     //scroll event listeners for player names.
     boardControls.children[0].addEventListener("click", scrollForward);
     boardControls.children[1].addEventListener("click", scrollForward);
+    form.children[0].children[0].children[3].addEventListener(
+      "click",
+      switchPlayerType
+    );
+    form.children[0].children[1].children[3].addEventListener(
+      "click",
+      switchPlayerType
+    );
     initializeBoard();
     highlightPlayer(Gameboard.currentPlayer.getMark());
   }
@@ -204,15 +228,15 @@ const DomHandler = (function () {
         board.appendChild(newSquare); //add square to dom
       }
     }
-    board.style.visibility = "hidden";
-    boardControls.style.visibility = "hidden";
+    board.style.display = "none";
+    boardControls.style.display = "none";
   }
   //play button event listener
   function submitHandler(e) {
     e.preventDefault();
     console.log(this);
-    board.style.visibility = "visible";
-    boardControls.style.visibility = "visible";
+    board.style.display = "grid";
+    boardControls.style.display = "grid";
     form.style.display = "none";
     let player1name = form.children[0].children[0].children[1].value;
     let player2name = form.children[0].children[1].children[1].value;
@@ -227,6 +251,13 @@ const DomHandler = (function () {
   function setMark(e) {
     let ij = e.target.id.split("-");
     e.target.innerHTML = Gameboard.makeMark(parseInt(ij[0]), parseInt(ij[1]));
+    //tell bot to make move if it is the next player
+    Gameboard.makeMoveBot();
+  }
+  function setMarkBot(i, j) {
+    boardArray[i][j].innerHTML = Gameboard.makeMark(i, j);
+    //chains bot moves
+    Gameboard.makeMoveBot();
   }
   //removes event listeners from squares
   function freezeBoard() {
@@ -293,14 +324,13 @@ const DomHandler = (function () {
     //calculate length of p + extra fluff
     length = this.children[0].scrollWidth + 150;
     for (let i = 0; i < length; i++) {
-      setTimeout(scrollDiv, i*5, this);
-      console.log(this.scrollX);
+      setTimeout(scrollDiv, i * 5, this);
     }
-    setTimeout(scrollBack, length*5 + 500, this);
+    setTimeout(scrollBack, length * 5 + 500, this);
     //prevent function from being called while scrolling
-    this.removeEventListener('click', scrollForward);   
+    this.removeEventListener("click", scrollForward);
     //add event listener back after done scrolling
-    setTimeout(addScroll, length*5+550, this);
+    setTimeout(addScroll, length * 5 + 550, this);
   }
 
   function scrollDiv(div) {
@@ -312,7 +342,20 @@ const DomHandler = (function () {
   }
 
   function addScroll(div) {
-    div.addEventListener('click', scrollForward);
+    div.addEventListener("click", scrollForward);
+  }
+  //switches player type in js and html (for later use by user and Gameboard module)
+  function switchPlayerType() {
+    if (this.id === "player1type") {
+      playerX.setType(playerX.getType() === "Person" ? "Bot" : "Person");
+    } else {
+      playerO.setType(playerO.getType() === "Person" ? "Bot" : "Person");
+    }
+    this.src =
+      this.dataset.type === "Person"
+        ? "images/smart_toy.svg"
+        : "images/person.svg";
+    this.dataset.type = this.dataset.type === "Person" ? "Bot" : "Person";
   }
 
   initialize();
@@ -326,5 +369,29 @@ const DomHandler = (function () {
     highlightWin,
     showDialog,
     highlightPlayer,
+    setMarkBot,
   };
+})();
+
+const Bot = (function () {
+  function makeMove() {
+    let defendingSquares = [];
+    const availableSquares = [];
+    console.log("BOt made a move");
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (Gameboard.board[i][j] === " ") availableSquares.push([i, j]);
+      }
+    }
+    //pick random available square
+    if (availableSquares.length > 0) {
+      let randomIndex = Math.floor(Math.random() * availableSquares.length);
+      console.log(randomIndex);
+      DomHandler.setMarkBot(
+        availableSquares[randomIndex][0],
+        availableSquares[randomIndex][1]
+      );
+    }
+  }
+  return { makeMove };
 })();

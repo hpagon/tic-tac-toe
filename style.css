@@ -8,6 +8,7 @@
     --backdrop-color: rgba(255, 255, 255, 0.1);
     --backdrop-secondary-color: rgba(255, 255, 255, 0.4);
     --input-background-color: rgba(255, 255, 255, 0.01);
+    --svg-color: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
 }
 
 :root.light {
@@ -19,6 +20,7 @@
     --backdrop-color: rgba(0, 0, 0, 0.4);
     --backdrop-secondary-color: rgba(255, 255, 255, 0.4);
     --input-background-color: rgba(0, 0, 0, 0.01);
+    --svg-color: invert(0%) sepia(1%) saturate(7430%) hue-rotate(124deg) brightness(0%) contrast(100%);
 }
 
 * {
@@ -45,7 +47,6 @@ header {
 
 main {
     margin-top: 45px;
-    height: 1fr;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -54,17 +55,16 @@ main {
 }
 
 #menu {
-    position: fixed;
     display: block;
+    align-items: center;
     width: 500px;
-    margin: auto;
 }
 
 /* input container & submit */
 #menu form div {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 /* input & label */
@@ -72,6 +72,7 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    /* width: 250px; */
 }
 
 #menu form div div h2 {
@@ -84,11 +85,18 @@ main {
     font-size: 12px;
 }
 
+#menu form div div img {
+    height: 24px;
+    width: 24px;
+    margin: auto;
+    margin-top: 10px;
+    filter: var(--svg-color);
+}
+
 input {
     height: 40px;
     width: 200px;
     background-color: var(--input-background-color);
-    /* background-color: var(--backdrop-color); */
     border: 0px;
     border-bottom: 1px solid var(--font-color);
     color: var(--font-color);
@@ -103,7 +111,6 @@ input[type="submit"] {
     border: 0px;
     font-weight: 600;
     font-size: 18px;
-    /* opacity: 0.7; */
 }
 
 #game {
@@ -114,11 +121,9 @@ input[type="submit"] {
     align-items: center;
 }
 
-#board {
-    /* position: fixed; */
-    /* border: 1px solid black; */
-    width: 500px;
-    height: 500px;
+#board {    
+    width: 450px;
+    height: 450px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -138,7 +143,7 @@ input[type="submit"] {
 }
 
 #board-controls {
-    width: 470px;
+    width: 420px;
     height: 50px;
     display: grid;
     grid-template-columns: 5fr 5fr 1fr 1fr;
@@ -236,6 +241,7 @@ dialog[open]::backdrop {
     }
     #menu {
         scale: 0.9;
+        width: 400px;
     }
     #board-controls .player-div p {
         font-size: 20px;
@@ -250,6 +256,9 @@ dialog[open]::backdrop {
         width: 300px;
         height: 300px;
     }
+    #menu {
+        width: 300px;
+    }
     #menu form div {
      display: flex;
      flex-direction: column;
@@ -262,4 +271,9 @@ dialog[open]::backdrop {
     #board-controls .player-div p {
         font-size: 18px;
     }
+}
+/* pseudo styles */
+img:hover, input[type="submit"]:hover, .player-div:hover, #board div:hover {
+    cursor: pointer;
+    scale: 1.03;
 }
