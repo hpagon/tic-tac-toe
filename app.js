@@ -85,9 +85,9 @@ const Gameboard = (function (Player1, Player2) {
         }
       }
     }
-    //check off diagonal win condition
+    //check anti diagonal win condition
     if (win === false && j === 2 - i) {
-      //check if new mark is in an off diagonal square
+      //check if new mark is in an anti diagonal square
       win = true;
       for (let k = 0; k < 3; k++) {
         if (board[k][2 - k] !== mark) win = false;
@@ -147,10 +147,10 @@ const Gameboard = (function (Player1, Player2) {
   }
   function endGame() {
     for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          if(board[i][j] === ' ') board[i][j] = "-"; //occupy all empty squares so bot doesn't make move
-        }
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] === " ") board[i][j] = "-"; //occupy all empty squares so bot doesn't make move
       }
+    }
     DomHandler.freezeBoard();
     over = true;
   }
@@ -159,11 +159,14 @@ const Gameboard = (function (Player1, Player2) {
     console.log(currentPlayer.getType());
     if (currentPlayer.getType() === "Bot") Bot.makeMove();
   }
+  function getCurrentPlayer() {
+    return currentPlayer;
+  }
 
   initialize();
   display();
 
-  return { board, makeMark, display, currentPlayer, startGame, makeMoveBot };
+  return { board, makeMark, display, currentPlayer, startGame, makeMoveBot, getCurrentPlayer };
 })(playerX, playerO);
 
 //dom handler module
@@ -375,13 +378,79 @@ const DomHandler = (function () {
 
 const Bot = (function () {
   function makeMove() {
-    let defendingSquares = [];
+    console.log(`The new current player should be ${Gameboard.getCurrentPlayer().getName()}`);
+    const defendingSquares = [];
     const availableSquares = [];
+    let centerPieceAvailable = false;
+    const connect2Squares = [];
+    const corners = [];
     console.log("BOt made a move");
+    console.log(`The bot is ${Gameboard.getCurrentPlayer().getName()}`);
+    console.log(`Their mark is ${Gameboard.getCurrentPlayer().getMark()}`);
+    //check rows & available squares
     for (let i = 0; i < 3; i++) {
+      let tempAvailableSquare = [];
+      let playerMarkCount = 0;
+      let opponentMarkCount = 0;
       for (let j = 0; j < 3; j++) {
-        if (Gameboard.board[i][j] === " ") availableSquares.push([i, j]);
+        if (Gameboard.board[i][j] === " ") {
+          availableSquares.push([i, j]);
+          tempAvailableSquare.push([i, j]);
+        } else {
+          Gameboard.board[i][j] === Gameboard.getCurrentPlayer().getMark()
+            ? playerMarkCount++
+            : opponentMarkCount++;
+        }
       }
+      if (playerMarkCount === 2 && opponentMarkCount === 0) {
+        //make move if win condition
+        console.log("Going for the win");
+        DomHandler.setMarkBot(
+          tempAvailableSquare[0][0],
+          tempAvailableSquare[0][1]
+        );
+        return;
+      }
+      if (opponentMarkCount === 2 && playerMarkCount === 0)
+        defendingSquares.push(tempAvailableSquare.pop());
+    }
+    //check columns
+    for (let i = 0; i < 3; i++) {
+      let tempAvailableSquare = [];
+      let playerMarkCount = 0;
+      let opponentMarkCount = 0;
+      for (let j = 0; j < 3; j++) {
+        if (Gameboard.board[j][i] === " ") {
+          tempAvailableSquare.push([j, i]);
+        } else if (
+          Gameboard.board[j][i] === Gameboard.getCurrentPlayer().getMark()
+        ) {
+          playerMarkCount++;
+        } else {
+          opponentMarkCount++;
+        }
+      }
+      if (playerMarkCount === 2 && opponentMarkCount === 0) {
+        //go for the win
+        DomHandler.setMarkBot(
+          tempAvailableSquare[0][0],
+          tempAvailableSquare[0][1]
+        );
+        return;
+      }
+      if (opponentMarkCount === 2 && playerMarkCount === 0)
+        defendingSquares.push(tempAvailableSquare.pop());
+    }
+    //check diagonal
+    //check anti diagional
+    //check if centerpiece is available
+    if (Gameboard.board[1][1] === " ") centerPieceAvailable = true;
+    //check if corners available
+    //pick defending square if available
+    if (defendingSquares.length !== 0) {
+      console.log("defending");
+      DomHandler.setMarkBot(defendingSquares[0][0], defendingSquares[0][1]);
+      return;
     }
     //pick random available square
     if (availableSquares.length > 0) {
