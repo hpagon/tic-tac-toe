@@ -166,7 +166,15 @@ const Gameboard = (function (Player1, Player2) {
   initialize();
   display();
 
-  return { board, makeMark, display, currentPlayer, startGame, makeMoveBot, getCurrentPlayer };
+  return {
+    board,
+    makeMark,
+    display,
+    currentPlayer,
+    startGame,
+    makeMoveBot,
+    getCurrentPlayer,
+  };
 })(playerX, playerO);
 
 //dom handler module
@@ -378,7 +386,9 @@ const DomHandler = (function () {
 
 const Bot = (function () {
   function makeMove() {
-    console.log(`The new current player should be ${Gameboard.getCurrentPlayer().getName()}`);
+    console.log(
+      `The new current player should be ${Gameboard.getCurrentPlayer().getName()}`
+    );
     const defendingSquares = [];
     const availableSquares = [];
     let centerPieceAvailable = false;
@@ -387,11 +397,11 @@ const Bot = (function () {
     console.log("BOt made a move");
     console.log(`The bot is ${Gameboard.getCurrentPlayer().getName()}`);
     console.log(`Their mark is ${Gameboard.getCurrentPlayer().getMark()}`);
+    let tempAvailableSquare = [];
+    let playerMarkCount = 0;
+    let opponentMarkCount = 0;
     //check rows & available squares
     for (let i = 0; i < 3; i++) {
-      let tempAvailableSquare = [];
-      let playerMarkCount = 0;
-      let opponentMarkCount = 0;
       for (let j = 0; j < 3; j++) {
         if (Gameboard.board[i][j] === " ") {
           availableSquares.push([i, j]);
@@ -413,12 +423,12 @@ const Bot = (function () {
       }
       if (opponentMarkCount === 2 && playerMarkCount === 0)
         defendingSquares.push(tempAvailableSquare.pop());
+      playerMarkCount = 0;
+      opponentMarkCount = 0;
+      tempAvailableSquare.splice(0, tempAvailableSquare.length);
     }
     //check columns
     for (let i = 0; i < 3; i++) {
-      let tempAvailableSquare = [];
-      let playerMarkCount = 0;
-      let opponentMarkCount = 0;
       for (let j = 0; j < 3; j++) {
         if (Gameboard.board[j][i] === " ") {
           tempAvailableSquare.push([j, i]);
@@ -440,17 +450,84 @@ const Bot = (function () {
       }
       if (opponentMarkCount === 2 && playerMarkCount === 0)
         defendingSquares.push(tempAvailableSquare.pop());
+      playerMarkCount = 0;
+      opponentMarkCount = 0;
+      tempAvailableSquare.splice(0, tempAvailableSquare.length);
     }
     //check diagonal
+    for (let i = 0; i < 3; i++) {
+      if (Gameboard.board[i][i] === " ") {
+        tempAvailableSquare.push([i, i]);
+      } else if (
+        Gameboard.board[i][i] === Gameboard.getCurrentPlayer().getMark()
+      ) {
+        playerMarkCount++;
+      } else {
+        opponentMarkCount++;
+      }
+    }
+    if (playerMarkCount === 2 && opponentMarkCount === 0) {
+      //go for the win
+      DomHandler.setMarkBot(
+        tempAvailableSquare[0][0],
+        tempAvailableSquare[0][1]
+      );
+      return;
+    }
+    if (opponentMarkCount === 2 && playerMarkCount === 0)
+      defendingSquares.push(tempAvailableSquare.pop());
+    playerMarkCount = 0;
+    opponentMarkCount = 0;
+    tempAvailableSquare.splice(0, tempAvailableSquare.length);
     //check anti diagional
+    for (let i = 0; i < 3; i++) {
+      if (Gameboard.board[i][2 - i] === " ") {
+        console.log(`im in the off diagonal at coordinates [${i}, ${2 - i}]`);
+        tempAvailableSquare.push([i, 2 - i]);
+      } else if (
+        Gameboard.board[i][2 - i] === Gameboard.getCurrentPlayer().getMark()
+      ) {
+        playerMarkCount++;
+      } else {
+        opponentMarkCount++;
+      }
+    }
+    if (playerMarkCount === 2 && opponentMarkCount === 0) {
+      //go for the win
+      DomHandler.setMarkBot(
+        tempAvailableSquare[0][0],
+        tempAvailableSquare[0][1]
+      );
+      return;
+    }
+    if (opponentMarkCount === 2 && playerMarkCount === 0)
+      defendingSquares.push(tempAvailableSquare.pop());
+    playerMarkCount = 0;
+    opponentMarkCount = 0;
+    tempAvailableSquare.splice(0, tempAvailableSquare.length);
     //check if centerpiece is available
     if (Gameboard.board[1][1] === " ") centerPieceAvailable = true;
     //check if corners available
+    if (Gameboard.board[0][0] === " ") corners.push([0, 0]);
+    if (Gameboard.board[0][2] === " ") corners.push([0, 2]);
+    if (Gameboard.board[2][0] === " ") corners.push([2, 0]);
+    if (Gameboard.board[2][2] === " ") corners.push([2, 2]);
     //pick defending square if available
     if (defendingSquares.length !== 0) {
       console.log("defending");
       DomHandler.setMarkBot(defendingSquares[0][0], defendingSquares[0][1]);
       return;
+    }
+    //pick center piece if available
+    if (centerPieceAvailable) {
+      DomHandler.setMarkBot(1, 1);
+      return;
+    }
+    //pick corner if available
+    if(corners.length > 0) {
+        let randomIndex = Math.floor(Math.random() * corners.length);
+        DomHandler.setMarkBot(corners[randomIndex][0], corners[randomIndex][1]);
+        return;
     }
     //pick random available square
     if (availableSquares.length > 0) {
