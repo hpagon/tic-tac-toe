@@ -223,6 +223,9 @@ const DomHandler = (function () {
       "click",
       switchPlayerType
     );
+    //hide bot difficulty descriptors
+    form.children[0].children[0].children[3].children[1].style.display = "none";
+    form.children[0].children[1].children[3].children[1].style.display = "none";
     initializeBoard();
     highlightPlayer(Gameboard.currentPlayer.getMark());
   }
@@ -257,6 +260,8 @@ const DomHandler = (function () {
       playerX.getName(); //set name in board controls
     boardControls.children[1].children[0].children[0].innerHTML =
       playerO.getName();
+    //if current player was changed to bot, make the bot play immediately
+    if (Gameboard.getCurrentPlayer().getType() === "Bot") Bot.makeMove();
   }
   //sends indices of selected square to Gameboard module and updates UI with marking on square
   function setMark(e) {
@@ -357,16 +362,53 @@ const DomHandler = (function () {
   }
   //switches player type in js and html (for later use by user and Gameboard module)
   function switchPlayerType() {
-    if (this.id === "player1type") {
-      playerX.setType(playerX.getType() === "Person" ? "Bot" : "Person");
-    } else {
-      playerO.setType(playerO.getType() === "Person" ? "Bot" : "Person");
+    // if (this.children[0].id === "player1type") {
+    //   playerX.setType(playerX.getType() === "Person" ? "Bot" : "Person");
+    // } else {
+    //   playerO.setType(playerO.getType() === "Person" ? "Bot" : "Person");
+    // }
+    // this.children[0].src =
+    //   this.children[0].dataset.type === "Person"
+    //     ? "images/smart_toy.svg"
+    //     : "images/person.svg";
+    // this.children[0].dataset.type =
+    //   this.children[0].dataset.type === "Person" ? "Bot" : "Person";
+    // console.log(this.children[1]);
+    //toggle bot difficulty descriptors
+    switch (this.children[1].innerHTML) {
+      case "Human":
+        //change type to bot
+        if (this.children[0].id === "player1type") {
+          playerX.setType("Bot");
+        } else {
+          playerO.setType("Bot");
+        }
+        this.children[0].src = "images/smart_toy.svg"
+        this.children[1].innerHTML = "Easy";
+        this.children[1].style.display = 'block';
+        console.log("from human to easy");
+        break;
+      case "Easy":
+        console.log("from easy to medium");
+        this.children[1].innerHTML = "Medium";
+        break;
+      case "Medium":
+        console.log("from medium to hard");
+        this.children[1].innerHTML = "Hard";
+        break;
+      case "Hard":
+        //change type back to human
+        if (this.children[0].id === "player1type") {
+            playerX.setType("Person");
+          } else {
+            playerO.setType("Person");
+          }
+          this.children[0].src = "images/person.svg"
+        this.children[1].innerHTML = "Human";
+        this.children[1].style.display = 'none';
+        console.log("from hard to human");
+        break;
     }
-    this.src =
-      this.dataset.type === "Person"
-        ? "images/smart_toy.svg"
-        : "images/person.svg";
-    this.dataset.type = this.dataset.type === "Person" ? "Bot" : "Person";
   }
 
   initialize();
@@ -524,10 +566,10 @@ const Bot = (function () {
       return;
     }
     //pick corner if available
-    if(corners.length > 0) {
-        let randomIndex = Math.floor(Math.random() * corners.length);
-        DomHandler.setMarkBot(corners[randomIndex][0], corners[randomIndex][1]);
-        return;
+    if (corners.length > 0) {
+      let randomIndex = Math.floor(Math.random() * corners.length);
+      DomHandler.setMarkBot(corners[randomIndex][0], corners[randomIndex][1]);
+      return;
     }
     //pick random available square
     if (availableSquares.length > 0) {

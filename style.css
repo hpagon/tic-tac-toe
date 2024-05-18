@@ -85,12 +85,24 @@ main {
     font-size: 12px;
 }
 
+#menu form div div div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10px;
+}
+
 #menu form div div img {
     height: 24px;
     width: 24px;
-    margin: auto;
-    margin-top: 10px;
     filter: var(--svg-color);
+    margin-right: 5px;
+}
+
+#menu form div div div p {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--font-color);
 }
 
 input {
@@ -273,7 +285,7 @@ dialog[open]::backdrop {
     }
 }
 /* pseudo styles */
-img:hover, input[type="submit"]:hover, .player-div:hover, #board div:hover {
+img:hover, input[type="submit"]:hover, .player-div:hover, #board div:hover, #menu div div div:hover {
     cursor: pointer;
     scale: 1.03;
 }
