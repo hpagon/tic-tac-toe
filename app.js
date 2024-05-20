@@ -1,5 +1,5 @@
 //player factory function
-const Player = function (mark, name, type) {
+const Player = function (mark, name, type, botDifficulty) {
   function getMark() {
     return mark;
   }
@@ -15,12 +15,26 @@ const Player = function (mark, name, type) {
   function setType(newType) {
     type = newType;
   }
-  return { getMark, getName, setName, getType, setType };
+  function getBotDifficulty() {
+    return botDifficulty;
+  }
+  function setBotDifficulty(newDifficulty) {
+    botDifficulty = newDifficulty;
+  }
+  return {
+    getMark,
+    getName,
+    setName,
+    getType,
+    setType,
+    getBotDifficulty,
+    setBotDifficulty,
+  };
 };
 
 //players
-const playerX = Player("X", "PlayerX", "Person");
-const playerO = Player("O", "PlayerO", "Person");
+const playerX = Player("X", "PlayerX", "Person", 0);
+const playerO = Player("O", "PlayerO", "Person", 0);
 
 //gameboard module
 const Gameboard = (function (Player1, Player2) {
@@ -383,30 +397,45 @@ const DomHandler = (function () {
         } else {
           playerO.setType("Bot");
         }
-        this.children[0].src = "images/smart_toy.svg"
+        this.children[0].src = "images/smart_toy.svg";
         this.children[1].innerHTML = "Easy";
-        this.children[1].style.display = 'block';
+        this.children[1].style.display = "block";
         console.log("from human to easy");
         break;
       case "Easy":
         console.log("from easy to medium");
         this.children[1].innerHTML = "Medium";
+        if (this.children[0].id === "player1type") {
+            playerX.setBotDifficulty(1);
+          } else {
+            playerO.setBotDifficulty(1);
+          }
         break;
       case "Medium":
         console.log("from medium to hard");
         this.children[1].innerHTML = "Hard";
+        if (this.children[0].id === "player1type") {
+            playerX.setBotDifficulty(2);
+          } else {
+            playerO.setBotDifficulty(2);
+          }
         break;
       case "Hard":
         //change type back to human
         if (this.children[0].id === "player1type") {
-            playerX.setType("Person");
-          } else {
-            playerO.setType("Person");
-          }
-          this.children[0].src = "images/person.svg"
+          playerX.setType("Person");
+        } else {
+          playerO.setType("Person");
+        }
+        this.children[0].src = "images/person.svg";
         this.children[1].innerHTML = "Human";
-        this.children[1].style.display = 'none';
+        this.children[1].style.display = "none";
         console.log("from hard to human");
+        if (this.children[0].id === "player1type") {
+            playerX.setBotDifficulty(0);
+          } else {
+            playerO.setBotDifficulty(0);
+          }
         break;
     }
   }
@@ -425,7 +454,7 @@ const DomHandler = (function () {
     setMarkBot,
   };
 })();
-
+//bot module
 const Bot = (function () {
   function makeMove() {
     console.log(
@@ -436,6 +465,7 @@ const Bot = (function () {
     let centerPieceAvailable = false;
     const connect2Squares = [];
     const corners = [];
+    const middlePieces = [];
     console.log("BOt made a move");
     console.log(`The bot is ${Gameboard.getCurrentPlayer().getName()}`);
     console.log(`Their mark is ${Gameboard.getCurrentPlayer().getMark()}`);
@@ -454,7 +484,7 @@ const Bot = (function () {
             : opponentMarkCount++;
         }
       }
-      if (playerMarkCount === 2 && opponentMarkCount === 0) {
+      if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
         //make move if win condition
         console.log("Going for the win");
         DomHandler.setMarkBot(
@@ -482,7 +512,7 @@ const Bot = (function () {
           opponentMarkCount++;
         }
       }
-      if (playerMarkCount === 2 && opponentMarkCount === 0) {
+      if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
         //go for the win
         DomHandler.setMarkBot(
           tempAvailableSquare[0][0],
@@ -508,7 +538,7 @@ const Bot = (function () {
         opponentMarkCount++;
       }
     }
-    if (playerMarkCount === 2 && opponentMarkCount === 0) {
+    if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
       //go for the win
       DomHandler.setMarkBot(
         tempAvailableSquare[0][0],
@@ -534,7 +564,7 @@ const Bot = (function () {
         opponentMarkCount++;
       }
     }
-    if (playerMarkCount === 2 && opponentMarkCount === 0) {
+    if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
       //go for the win
       DomHandler.setMarkBot(
         tempAvailableSquare[0][0],
@@ -554,23 +584,34 @@ const Bot = (function () {
     if (Gameboard.board[0][2] === " ") corners.push([0, 2]);
     if (Gameboard.board[2][0] === " ") corners.push([2, 0]);
     if (Gameboard.board[2][2] === " ") corners.push([2, 2]);
+    //check if middle pieces available
+    // if (Gameboard.board[0][1] === " ") middlePieces.push([0, 1]);
+    // if (Gameboard.board[1][0] === " ") middlePieces.push([1, 0]);
+    // if (Gameboard.board[1][2] === " ") middlePieces.push([1, 2]);
+    // if (Gameboard.board[2][1] === " ") middlePieces.push([2, 1]);
     //pick defending square if available
-    if (defendingSquares.length !== 0) {
+    if (defendingSquares.length !== 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
       console.log("defending");
       DomHandler.setMarkBot(defendingSquares[0][0], defendingSquares[0][1]);
       return;
     }
     //pick center piece if available
-    if (centerPieceAvailable) {
+    if (centerPieceAvailable && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
       DomHandler.setMarkBot(1, 1);
       return;
     }
-    //pick corner if available
-    if (corners.length > 0) {
+    //pick corner if available & optimal
+    if (corners.length >= 3 && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
       let randomIndex = Math.floor(Math.random() * corners.length);
       DomHandler.setMarkBot(corners[randomIndex][0], corners[randomIndex][1]);
       return;
     }
+    //pick middle piece if available
+    // if (middlePieces.length > 0 && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
+    //     let randomIndex = Math.floor(Math.random() * middlePieces.length);
+    //     DomHandler.setMarkBot(middlePieces[randomIndex][0], middlePieces[randomIndex][1]);
+    //     return;
+    //   }
     //pick random available square
     if (availableSquares.length > 0) {
       let randomIndex = Math.floor(Math.random() * availableSquares.length);
