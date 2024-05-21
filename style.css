@@ -72,7 +72,6 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* width: 250px; */
 }
 
 #menu form div div h2 {
@@ -144,7 +143,6 @@ input[type="submit"] {
 }
 /* square style */
 #board div {
-    /* border: 1px solid black; */
     display: flex;
     align-items: center;
     justify-content: center;
