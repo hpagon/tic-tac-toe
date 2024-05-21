@@ -60,10 +60,8 @@ const Gameboard = (function (Player1, Player2) {
     if (board[i][j] !== " ") return board[i][j]; //check if square has been used, then exit
     board[i][j] = currentPlayer.getMark(); //insert value into board
     turns++;
-    display();
     if (checkWin(i, j, currentPlayer.getMark())) {
       //win
-      console.log(`${currentPlayer.getName()} won the game!`);
       endGame();
       DomHandler.showDialog(currentPlayer.getName() + " ", "wins");
       return board[i][j];
@@ -71,13 +69,11 @@ const Gameboard = (function (Player1, Player2) {
     if (turns === 9) {
       //tie
       endGame();
-      console.log("Tie");
       DomHandler.showDialog("", "Tie");
       return board[i][j];
     }
     currentPlayer = currentPlayer === Player1 ? Player2 : Player1; //toggle current player
     DomHandler.highlightPlayer(currentPlayer.getMark());
-    console.log(`Its now ${currentPlayer.getName()}'s turn...`);
     return board[i][j]; //return mark string ("X" or "O")
   }
   //checks if win conditions have been mets
@@ -170,7 +166,6 @@ const Gameboard = (function (Player1, Player2) {
   }
   //So the updated current player can be accessed
   function makeMoveBot() {
-    console.log(currentPlayer.getType());
     if (currentPlayer.getType() === "Bot") Bot.makeMove();
   }
   function getCurrentPlayer() {
@@ -181,7 +176,6 @@ const Gameboard = (function (Player1, Player2) {
   }
 
   initialize();
-  display();
 
   return {
     board,
@@ -255,7 +249,6 @@ const DomHandler = (function () {
         let newSquare = document.createElement("div");
         newSquare.id = `${i}-${j}`;
         newSquare.addEventListener("click", setMark);
-        console.log(newSquare);
         boardArray[boardArray.length - 1].push(newSquare); //add square to row array inside board matrix
         board.appendChild(newSquare); //add square to dom
       }
@@ -266,7 +259,6 @@ const DomHandler = (function () {
   //play button event listener
   function submitHandler(e) {
     e.preventDefault();
-    console.log(this);
     board.style.display = "grid";
     boardControls.style.display = "grid";
     form.style.display = "none";
@@ -320,7 +312,6 @@ const DomHandler = (function () {
   }
   //highlights the winning combination of squares
   function highlightWin(winningSquares) {
-    console.log(winningSquares);
     for (let square of winningSquares) {
       boardArray[square[0]][square[1]].classList.add("highlight");
     }
@@ -380,19 +371,6 @@ const DomHandler = (function () {
   }
   //switches player type in js and html (for later use by user and Gameboard module)
   function switchPlayerType() {
-    // if (this.children[0].id === "player1type") {
-    //   playerX.setType(playerX.getType() === "Person" ? "Bot" : "Person");
-    // } else {
-    //   playerO.setType(playerO.getType() === "Person" ? "Bot" : "Person");
-    // }
-    // this.children[0].src =
-    //   this.children[0].dataset.type === "Person"
-    //     ? "images/smart_toy.svg"
-    //     : "images/person.svg";
-    // this.children[0].dataset.type =
-    //   this.children[0].dataset.type === "Person" ? "Bot" : "Person";
-    // console.log(this.children[1]);
-    //toggle bot difficulty descriptors
     switch (this.children[1].innerHTML) {
       case "Human":
         //change type to bot
@@ -404,10 +382,8 @@ const DomHandler = (function () {
         this.children[0].src = "images/smart_toy.svg";
         this.children[1].innerHTML = "Easy";
         this.children[1].style.display = "block";
-        console.log("from human to easy");
         break;
       case "Easy":
-        console.log("from easy to medium");
         this.children[1].innerHTML = "Medium";
         if (this.children[0].id === "player1type") {
           playerX.setBotDifficulty(1);
@@ -416,7 +392,6 @@ const DomHandler = (function () {
         }
         break;
       case "Medium":
-        console.log("from medium to hard");
         this.children[1].innerHTML = "Hard";
         if (this.children[0].id === "player1type") {
           playerX.setBotDifficulty(2);
@@ -434,7 +409,6 @@ const DomHandler = (function () {
         this.children[0].src = "images/person.svg";
         this.children[1].innerHTML = "Human";
         this.children[1].style.display = "none";
-        console.log("from hard to human");
         if (this.children[0].id === "player1type") {
           playerX.setBotDifficulty(0);
         } else {
@@ -467,10 +441,6 @@ const Bot = (function () {
     const connect2Squares = [];
     const corners = [];
     const middlePieces = [];
-    console.log("BOt made a move");
-    console.log(`The bot is ${Gameboard.getCurrentPlayer().getName()}`);
-    console.log(`Their mark is ${Gameboard.getCurrentPlayer().getMark()}`);
-    console.log(`It is turn number ${Gameboard.getTurns()}`);
     let tempAvailableSquare = [];
     let playerMarkCount = 0;
     let opponentMarkCount = 0;
@@ -492,7 +462,6 @@ const Bot = (function () {
         Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
       ) {
         //make move if win condition
-        console.log("Going for the win");
         DomHandler.setMarkBot(
           tempAvailableSquare[0][0],
           tempAvailableSquare[0][1]
@@ -568,7 +537,6 @@ const Bot = (function () {
     //check anti diagional
     for (let i = 0; i < 3; i++) {
       if (Gameboard.board[i][2 - i] === " ") {
-        console.log(`im in the off diagonal at coordinates [${i}, ${2 - i}]`);
         tempAvailableSquare.push([i, 2 - i]);
       } else if (
         Gameboard.board[i][2 - i] === Gameboard.getCurrentPlayer().getMark()
@@ -602,17 +570,11 @@ const Bot = (function () {
     if (Gameboard.board[0][2] === " ") corners.push([0, 2]);
     if (Gameboard.board[2][0] === " ") corners.push([2, 0]);
     if (Gameboard.board[2][2] === " ") corners.push([2, 2]);
-    //check if middle pieces available
-    // if (Gameboard.board[0][1] === " ") middlePieces.push([0, 1]);
-    // if (Gameboard.board[1][0] === " ") middlePieces.push([1, 0]);
-    // if (Gameboard.board[1][2] === " ") middlePieces.push([1, 2]);
-    // if (Gameboard.board[2][1] === " ") middlePieces.push([2, 1]);
     //pick defending square if available
     if (
       defendingSquares.length !== 0 &&
       Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
     ) {
-      console.log("defending");
       DomHandler.setMarkBot(defendingSquares[0][0], defendingSquares[0][1]);
       return;
     }
@@ -661,12 +623,6 @@ const Bot = (function () {
             opponentCorner[0] === 0 ? 2 : 0,
             opponentCorner[1] === 0 ? 2 : 0,
           ];
-          console.log(
-            `The original corner is [${opponentCorner[0]}, ${opponentCorner[1]}]`
-          );
-          console.log(
-            `Opposite corner is found to be [${oppositeCorner[0]}, ${oppositeCorner[1]}]`
-          );
           let fork1 = [1, oppositeCorner[1]];
           let fork2 = [oppositeCorner[0], 1];
           if (Gameboard.board[1][oppositeCorner[1]] !== " ") {
@@ -674,22 +630,12 @@ const Bot = (function () {
               oppositeCorner[0] === 0 ? 2 : 0,
               oppositeCorner[1]
             );
-            console.log(
-              `Found corner needed to be covered at [${
-                oppositeCorner[0] === 0 ? 2 : 0
-              }, ${oppositeCorner[1]}]`
-            );
             return;
           }
           if (Gameboard.board[oppositeCorner[0]][1] !== " ") {
             DomHandler.setMarkBot(
               oppositeCorner[0],
               oppositeCorner[1] === 0 ? 2 : 0
-            );
-            console.log(
-              `Found corner needed to be covered at [${oppositeCorner[0]}, ${
-                oppositeCorner[1] === 0 ? 2 : 0
-              }]`
             );
             return;
           }
@@ -701,11 +647,9 @@ const Bot = (function () {
           if (Gameboard.board[1][0] !== " ") edges.push([1, 0]);
           if (Gameboard.board[1][2] !== " ") edges.push([1, 2]);
           if (Gameboard.board[2][1] !== " ") edges.push([2, 1]);
-          console.log("This is edges array", edges);
           //if the non edges form a fork, mark the corner between the two edges
           if (edges[0][0] !== edges[1][0] && edges[0][1] !== edges[1][1]) {
             let tempCorner = edges[0];
-            console.log("This is tempCorner", tempCorner);
             //override corner values if they are on an edge to get correct corner
             tempCorner[0] =
               tempCorner[0] === 0 || tempCorner[0] === 2
@@ -715,9 +659,6 @@ const Bot = (function () {
               tempCorner[1] === 0 || tempCorner[1] === 2
                 ? tempCorner[1]
                 : edges[1][1];
-            console.log(
-              `The corner needed to be filled is at [${tempCorner[0]}, ${tempCorner[1]}]`
-            );
             DomHandler.setMarkBot(tempCorner[0], tempCorner[1]);
             return;
           }
@@ -728,33 +669,18 @@ const Bot = (function () {
         //if triangle being setup, then mark one of the remaining corners
         if (corners.length === 2) {
           DomHandler.setMarkBot(corners[0][0], corners[0][1]);
-          console.log("prevented a triangle");
           return;
         }
       }
     }
-
-    //pick middle piece if available
-    // if (middlePieces.length > 0 && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
-    //     let randomIndex = Math.floor(Math.random() * middlePieces.length);
-    //     DomHandler.setMarkBot(middlePieces[randomIndex][0], middlePieces[randomIndex][1]);
-    //     return;
-    //   }
     //pick random available square as last case scenario (for all difficulties)
     if (availableSquares.length > 0) {
       let randomIndex = Math.floor(Math.random() * availableSquares.length);
-      console.log(randomIndex);
       DomHandler.setMarkBot(
         availableSquares[randomIndex][0],
         availableSquares[randomIndex][1]
       );
     }
   }
-  //   function checkFork() {
-  //     let row1taken = board === ;
-  //     let row3taken = false;
-  //     let column1taken = false;
-  //     let column3taken = false;
-  //   }
   return { makeMove };
 })();
