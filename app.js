@@ -694,15 +694,43 @@ const Bot = (function () {
             return;
           }
         }
-      } 
+        //investigate if it could be a fork involving non corner edges
+        if (corners.length === 4) {
+          let edges = [];
+          if (Gameboard.board[0][1] !== " ") edges.push([0, 1]);
+          if (Gameboard.board[1][0] !== " ") edges.push([1, 0]);
+          if (Gameboard.board[1][2] !== " ") edges.push([1, 2]);
+          if (Gameboard.board[2][1] !== " ") edges.push([2, 1]);
+          console.log("This is edges array", edges);
+          //if the non edges form a fork, mark the corner between the two edges
+          if (edges[0][0] !== edges[1][0] && edges[0][1] !== edges[1][1]) {
+            let tempCorner = edges[0];
+            console.log("This is tempCorner", tempCorner);
+            //override corner values if they are on an edge to get correct corner
+            tempCorner[0] =
+              tempCorner[0] === 0 || tempCorner[0] === 2
+                ? tempCorner[0]
+                : edges[1][0];
+            tempCorner[1] =
+              tempCorner[1] === 0 || tempCorner[1] === 2
+                ? tempCorner[1]
+                : edges[1][1];
+            console.log(
+              `The corner needed to be filled is at [${tempCorner[0]}, ${tempCorner[1]}]`
+            );
+            DomHandler.setMarkBot(tempCorner[0], tempCorner[1]);
+            return;
+          }
+        }
+      }
       //if this is the fourth turn and the center piece is the opponent's
-      if(Gameboard.getTurns() === 3) {
-            //if triangle being setup mark, then mark one of the remaining corners
-            if(corners.length === 2) {
-                DomHandler.setMarkBot(corners[0][0], corners[0][1]);
-                console.log("prevented a triangle");
-                return;
-            }
+      if (Gameboard.getTurns() === 3) {
+        //if triangle being setup, then mark one of the remaining corners
+        if (corners.length === 2) {
+          DomHandler.setMarkBot(corners[0][0], corners[0][1]);
+          console.log("prevented a triangle");
+          return;
+        }
       }
     }
 
