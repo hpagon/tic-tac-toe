@@ -176,6 +176,9 @@ const Gameboard = (function (Player1, Player2) {
   function getCurrentPlayer() {
     return currentPlayer;
   }
+  function getTurns() {
+    return turns;
+  }
 
   initialize();
   display();
@@ -188,6 +191,7 @@ const Gameboard = (function (Player1, Player2) {
     startGame,
     makeMoveBot,
     getCurrentPlayer,
+    getTurns,
   };
 })(playerX, playerO);
 
@@ -406,19 +410,19 @@ const DomHandler = (function () {
         console.log("from easy to medium");
         this.children[1].innerHTML = "Medium";
         if (this.children[0].id === "player1type") {
-            playerX.setBotDifficulty(1);
-          } else {
-            playerO.setBotDifficulty(1);
-          }
+          playerX.setBotDifficulty(1);
+        } else {
+          playerO.setBotDifficulty(1);
+        }
         break;
       case "Medium":
         console.log("from medium to hard");
         this.children[1].innerHTML = "Hard";
         if (this.children[0].id === "player1type") {
-            playerX.setBotDifficulty(2);
-          } else {
-            playerO.setBotDifficulty(2);
-          }
+          playerX.setBotDifficulty(2);
+        } else {
+          playerO.setBotDifficulty(2);
+        }
         break;
       case "Hard":
         //change type back to human
@@ -432,10 +436,10 @@ const DomHandler = (function () {
         this.children[1].style.display = "none";
         console.log("from hard to human");
         if (this.children[0].id === "player1type") {
-            playerX.setBotDifficulty(0);
-          } else {
-            playerO.setBotDifficulty(0);
-          }
+          playerX.setBotDifficulty(0);
+        } else {
+          playerO.setBotDifficulty(0);
+        }
         break;
     }
   }
@@ -457,9 +461,6 @@ const DomHandler = (function () {
 //bot module
 const Bot = (function () {
   function makeMove() {
-    console.log(
-      `The new current player should be ${Gameboard.getCurrentPlayer().getName()}`
-    );
     const defendingSquares = [];
     const availableSquares = [];
     let centerPieceAvailable = false;
@@ -469,6 +470,7 @@ const Bot = (function () {
     console.log("BOt made a move");
     console.log(`The bot is ${Gameboard.getCurrentPlayer().getName()}`);
     console.log(`Their mark is ${Gameboard.getCurrentPlayer().getMark()}`);
+    console.log(`It is turn number ${Gameboard.getTurns()}`);
     let tempAvailableSquare = [];
     let playerMarkCount = 0;
     let opponentMarkCount = 0;
@@ -484,7 +486,11 @@ const Bot = (function () {
             : opponentMarkCount++;
         }
       }
-      if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
+      if (
+        playerMarkCount === 2 &&
+        opponentMarkCount === 0 &&
+        Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
+      ) {
         //make move if win condition
         console.log("Going for the win");
         DomHandler.setMarkBot(
@@ -512,7 +518,11 @@ const Bot = (function () {
           opponentMarkCount++;
         }
       }
-      if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
+      if (
+        playerMarkCount === 2 &&
+        opponentMarkCount === 0 &&
+        Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
+      ) {
         //go for the win
         DomHandler.setMarkBot(
           tempAvailableSquare[0][0],
@@ -538,7 +548,11 @@ const Bot = (function () {
         opponentMarkCount++;
       }
     }
-    if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
+    if (
+      playerMarkCount === 2 &&
+      opponentMarkCount === 0 &&
+      Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
+    ) {
       //go for the win
       DomHandler.setMarkBot(
         tempAvailableSquare[0][0],
@@ -564,7 +578,11 @@ const Bot = (function () {
         opponentMarkCount++;
       }
     }
-    if (playerMarkCount === 2 && opponentMarkCount === 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
+    if (
+      playerMarkCount === 2 &&
+      opponentMarkCount === 0 &&
+      Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
+    ) {
       //go for the win
       DomHandler.setMarkBot(
         tempAvailableSquare[0][0],
@@ -590,29 +608,111 @@ const Bot = (function () {
     // if (Gameboard.board[1][2] === " ") middlePieces.push([1, 2]);
     // if (Gameboard.board[2][1] === " ") middlePieces.push([2, 1]);
     //pick defending square if available
-    if (defendingSquares.length !== 0 && Gameboard.getCurrentPlayer().getBotDifficulty() >= 1) {
+    if (
+      defendingSquares.length !== 0 &&
+      Gameboard.getCurrentPlayer().getBotDifficulty() >= 1
+    ) {
       console.log("defending");
       DomHandler.setMarkBot(defendingSquares[0][0], defendingSquares[0][1]);
       return;
     }
-    //pick center piece if available
-    if (centerPieceAvailable && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
-      DomHandler.setMarkBot(1, 1);
-      return;
+    //hard algorithm strategy
+    if (Gameboard.getCurrentPlayer().getBotDifficulty() === 2) {
+      //pick corner if first
+      if (corners.length > 0 && Gameboard.getTurns() === 0) {
+        let randomIndex = Math.floor(Math.random() * corners.length);
+        DomHandler.setMarkBot(corners[randomIndex][0], corners[randomIndex][1]);
+        return;
+      }
+      //if second turn or third turn
+      if (Gameboard.getTurns() === 1 || Gameboard.getTurns() === 2) {
+        //pick corner if centerpiece taken
+        if (!centerPieceAvailable) {
+          let randomIndex = Math.floor(Math.random() * corners.length);
+          DomHandler.setMarkBot(
+            corners[randomIndex][0],
+            corners[randomIndex][1]
+          );
+          return;
+        } else {
+          // else pick centerpiece
+          DomHandler.setMarkBot(1, 1);
+          return;
+        }
+      }
+      //if it is the fourth turn and centerpiece is ours
+      if (
+        Gameboard.getTurns() === 3 &&
+        Gameboard.board[1][1] === Gameboard.getCurrentPlayer().getMark()
+      ) {
+        //if there are corners on opposite ends place mark on non corner edge
+        if (corners.length === 2) {
+          DomHandler.setMarkBot(0, 1);
+          return;
+        }
+        //if fork place mark on corner between fork
+        if (corners.length === 3) {
+          let opponentCorner;
+          if (Gameboard.board[0][0] !== " ") opponentCorner = [0, 0];
+          if (Gameboard.board[0][2] !== " ") opponentCorner = [0, 2];
+          if (Gameboard.board[2][0] !== " ") opponentCorner = [2, 0];
+          if (Gameboard.board[2][2] !== " ") opponentCorner = [2, 2];
+          let oppositeCorner = [
+            opponentCorner[0] === 0 ? 2 : 0,
+            opponentCorner[1] === 0 ? 2 : 0,
+          ];
+          console.log(
+            `The original corner is [${opponentCorner[0]}, ${opponentCorner[1]}]`
+          );
+          console.log(
+            `Opposite corner is found to be [${oppositeCorner[0]}, ${oppositeCorner[1]}]`
+          );
+          let fork1 = [1, oppositeCorner[1]];
+          let fork2 = [oppositeCorner[0], 1];
+          if (Gameboard.board[1][oppositeCorner[1]] !== " ") {
+            DomHandler.setMarkBot(
+              oppositeCorner[0] === 0 ? 2 : 0,
+              oppositeCorner[1]
+            );
+            console.log(
+              `Found corner needed to be covered at [${
+                oppositeCorner[0] === 0 ? 2 : 0
+              }, ${oppositeCorner[1]}]`
+            );
+            return;
+          }
+          if (Gameboard.board[oppositeCorner[0]][1] !== " ") {
+            DomHandler.setMarkBot(
+              oppositeCorner[0],
+              oppositeCorner[1] === 0 ? 2 : 0
+            );
+            console.log(
+              `Found corner needed to be covered at [${oppositeCorner[0]}, ${
+                oppositeCorner[1] === 0 ? 2 : 0
+              }]`
+            );
+            return;
+          }
+        }
+      } 
+      //if this is the fourth turn and the center piece is the opponent's
+      if(Gameboard.getTurns() === 3) {
+            //if triangle being setup mark, then mark one of the remaining corners
+            if(corners.length === 2) {
+                DomHandler.setMarkBot(corners[0][0], corners[0][1]);
+                console.log("prevented a triangle");
+                return;
+            }
+      }
     }
-    //pick corner if available & optimal
-    if (corners.length >= 3 && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
-      let randomIndex = Math.floor(Math.random() * corners.length);
-      DomHandler.setMarkBot(corners[randomIndex][0], corners[randomIndex][1]);
-      return;
-    }
+
     //pick middle piece if available
     // if (middlePieces.length > 0 && Gameboard.getCurrentPlayer().getBotDifficulty() == 2) {
     //     let randomIndex = Math.floor(Math.random() * middlePieces.length);
     //     DomHandler.setMarkBot(middlePieces[randomIndex][0], middlePieces[randomIndex][1]);
     //     return;
     //   }
-    //pick random available square
+    //pick random available square as last case scenario (for all difficulties)
     if (availableSquares.length > 0) {
       let randomIndex = Math.floor(Math.random() * availableSquares.length);
       console.log(randomIndex);
@@ -622,5 +722,11 @@ const Bot = (function () {
       );
     }
   }
+  //   function checkFork() {
+  //     let row1taken = board === ;
+  //     let row3taken = false;
+  //     let column1taken = false;
+  //     let column3taken = false;
+  //   }
   return { makeMove };
 })();
