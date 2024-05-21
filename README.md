@@ -4,9 +4,12 @@ This project was completed as part of [The Odin Project](https://www.theodinproj
 
 The game follows the standard Tic-tac-toe playing conventions (I think), and it gives players the option to play against a friend or the computer. There are also three difficulties when playing against the computer ranging from easy to hard. Lastly, I added the ability to observe the computer playing against itself which I think is interesting to watch. 
 
-<img src="images/tictactoedemo.gif" alt="Tic-tac-toe demo video" style="height: 250px; justify-self">
-
 ### Play Live Here: https://hpagon.github.io/tic-tac-toe/
+<img src="images/tictactoedemo.gif" alt="Tic-tac-toe demo video" 
+style="height: 250px; justify-self">
+<img src="images/homescreen.png" alt="Home page screenshot" style="height: 250px; justify-self">
+<img src="images/examplegame.png" alt="Example game screenshot" style="height: 250px; justify-self">
+
 ## Credits
 - Icons:
     - [Google Material Symbols](https://fonts.google.com/icons)
